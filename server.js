@@ -36,7 +36,7 @@ global.phone = require('home-engine-phone');
 global.phone_socket = null;
 global.tablet_socket = null;
 
-var port = process.env.OPENSHIFT_INTERNAL_PORT || 3000
+var port = process.env.OPENSHIFT_INTERNAL_PORT || 3050
     , ip = process.env.OPENSHIFT_INTERNAL_IP || "192.168.1.177";
     console.log('Listening on ' + port);
 
