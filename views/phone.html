@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bootstrap 101 Template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+	<link rel="stylesheet" href="css/bootstrap-switch.css">
+	<style type='text/css'>
+	.has-switch span,.has-switch label.switch-large {
+		font-size: 12px;
+		
+	}
+	</style>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+
+	  <div class="panel panel-default">
+	    <div class="panel-heading">
+	      <h3 class="panel-title">Lamp</h3>
+	    </div>
+	    <div class="panel-body">
+			
+			<div id="bedroom" class="make-switch switch-large lamp" data-animated="true" data-text-label="Bedroom">
+			    <input type="checkbox">
+			</div>
+			<br/>
+			
+			<div id="bathroom" class="make-switch switch-large lamp" data-animated="true" data-text-label="Bathroom">
+			    <input type="checkbox">
+			</div>
+			<br/>
+			
+			<div id="living" class="make-switch switch-large lamp" data-animated="true" data-text-label="Living">
+			    <input type="checkbox">
+			</div>
+			<br/>
+			
+			<div id="kitchen" class="make-switch switch-large lamp" data-animated="true" data-text-label="Kitchen">
+			    <input type="checkbox">
+			</div>
+			<br/>
+			
+			<div id="hol" class="make-switch switch-large lamp" data-animated="true" data-text-label="Hol">
+			    <input type="checkbox">
+			</div>
+			<br/>
+			
+			
+	    </div>
+	  </div>
+	  
+	  <div class="panel panel-default">
+	    <div class="panel-heading">
+	      <h3 class="panel-title">Security</h3>
+	    </div>
+	    <div class="panel-body">
+			<a class="btn btn-primary btn-lg alarm">Alarm</a><br/>
+			
+	    </div>
+	  </div>
+
+
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap-switch.js"></script>
+	
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="script.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			setPseudo("phone");
+			$('.lamp').on('switch-change', function(e, data) {
+				if ( data.value == false ){
+					data = {'command' : {'name': 'turnOff', 'value': $(this).attr('data-text-label')} };
+					sentMessage( data );
+				}else{
+					data = {'command' : {'name': 'turnOn', 'value': $(this).attr('data-text-label')} };
+					sentMessage( data );					
+				}
+			 });
+			
+			
+			$(".alarm").click(function(){
+				if( $(this).hasClass("active") ){
+					clearInterval(alarm_interval);
+					$(this).removeClass("active").removeClass("btn-success").addClass("btn-primary");
+				}else{
+					alarm_interval = setInterval(alarm,1000);
+					$(this).addClass("active").removeClass("btn-primary").addClass('btn-success');
+				}
+			});
+			
+			
+		});
+		var state = true;
+		var alarm_interval = null;
+		function alarm(){
+			state = (state) ? false : true;
+			$('.lamp').each(function(){
+				if(state == true){
+					data = {'command' : {'name': 'turnOn', 'value': $(this).attr('data-text-label')} };
+					sentMessage( data );
+				}else{
+					data = {'command' : {'name': 'turnOff', 'value': $(this).attr('data-text-label')} };
+					sentMessage( data );
+				}
+			});
+		}
+		function parseMessage(message){
+			if(message.length == 0){
+				return;
+			}
+			console.log(message);
+			message = message.split(";");
+			console.log(message);
+			item = $("#" + message[0].toLowerCase() + ' a');
+			if(message[1] == "TRUE"){
+				$(item).text('Open').click();
+			}else{
+				$(item).text('Close').click();
+			}
+		}
+	</script>
+	
+	
+  </body>
+</html>

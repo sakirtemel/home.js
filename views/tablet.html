@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tablet Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+	<link rel="stylesheet" href="css/bootstrap-switch.css">
+	<style type='text/css'>
+  
+	body {
+	  font-family: 'Lucida Grande', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	  padding: 0px;
+	  font-size: 13px;
+	  background-color: #ffffff;
+	}
+	div.container{
+		padding-left: 0px;
+		margin-left: 0px;
+		padding-top: 50px;
+	}
+
+	div .image_div{
+	  background: #fff;
+	  margin: 0 auto;
+	  width: 350px;
+	  height: 450px;
+	  padding: 350px;
+	      position:absolute;
+
+
+	    background-image: url(room.jpg);
+	    background-size: 100%;
+	    background-repeat: no-repeat;
+
+
+	}
+	div .room{
+		text-align: center;
+	}
+	div#living{
+	  position:absolute;    
+	  width:325px;
+	  height: 360px;
+	  top: 0px;
+	  left: 0px;
+	}
+	div#kitchen{
+	  position:absolute;    
+	  width:325px;
+	  height: 280px;
+	  top: 360px;
+	  left: 0px;
+	}
+	div#bedroom{
+	  position:absolute;    
+	  width:375px;
+	  height: 365px;
+	  top: 0px;
+	  left: 325px;
+	}
+	div#bathroom{
+	  position:absolute;    
+	  width:230px;
+	  height: 275px;
+	  top: 365px;
+	  left: 470px;
+	}
+	div#hol{
+	  position:absolute;    
+	  width:145px;
+	  height: 275px;
+	  top: 365px;
+	  left: 325px;
+	}
+	.shadow{
+	  z-index: 100;
+	  background: rgba(0,0,0,.6);
+
+	}
+	span{
+		line-height: 250px;
+		color: white;
+		font-size: 14px;
+		opacity: 0.6;
+	}
+	span a{
+		color: white;
+	}
+			
+	</style>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+
+	<div class="container" style="position:relative;">
+
+	<div class="image_div">
+		<div id='living' class="room shadow" style=""><span><a href='#'>Open</a></span></div>
+		<div id='bedroom' class="room shadow" style=""><span><a href='#'>Open</a></span></div>
+		<div id='kitchen' class="room shadow" style=""><span><a href='#'>Open</a></span></div>
+		<div id='bathroom' class="room shadow" style=""><span><a href='#'>Open</a></span></div>
+		<div id='hol' class="room shadow" style=""><span><a href='#'>Open</a></span></div>
+	</div>
+	
+	<div class="panel panel-default" style='margin-left: 720px; width: 250px;'>
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Outside</h3>
+	  </div>
+	  <div class="panel-body">
+		  <a href='#' id='bell' class='btn btn-lg btn-primary'><span class='glyphicon glyphicon-bell' style=' font-size:17px; padding-left: 0px;margin-right:6px;'></span>Bell</a>
+		  <a href='#' id='door' class='btn btn-lg btn-danger disabled' style='margin-left:40px;opacity: 0.2;'>Door</a>
+	  </div>
+	</div>
+	
+</div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap-switch.js"></script>
+	
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="script.js"></script>
+	<script src="ion.sound/js/ion-sound/ion.sound.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		setPseudo("tablet");
+		
+		$('.room a').each(function(){
+			$(this).addClass('btn btn-default btn-lg');
+		});
+		
+		$('.room a').click(function(){
+			id = $(this).closest('div').attr('id');
+			
+			if ( $(this).text() == 'Open' ){
+				$(this).text('Close');
+				$('#' + id).removeClass('shadow');
+				data = {'info' : {'name': 'turnedOn', 'value': id }};
+				sentMessage( data );
+			}else{
+				$(this).text('Open');
+				$('#' + id).addClass('shadow');
+				data = {'info' : {'name': 'turnedOff', 'value': id }};
+				sentMessage( data );
+			}
+		});
+		
+		//Sounds
+		$.ionSound({
+		    sounds: [
+		        "dingdong",
+				'door_open'
+		    ],
+		    path: "ion.sound/sounds/",                // set path to sounds
+			volume: 0.8
+		});
+		$('#bell').click(function(){
+			$.ionSound.play("dingdong");
+		});
+		
+		
+		
+	});
+	function parseMessage(message){
+		if(message.length == 0){
+			return;
+		}
+		console.log(message);
+		message = message.split(";");
+		console.log(message);
+		
+		if(message[0] == 'door'){
+				$('#door').css('opacity', '1')
+				$.ionSound.play("door_open");
+				$('#door').css('opacity', '0.2')
+		}else{
+			item = $("#" + message[0].toLowerCase() + ' a');
+			if(message[1] == "TRUE"){
+				$(item).text('Open').click();
+			}else{
+				$(item).text('Close').click();
+			}
+		}
+	}
+	</script>
+	
+	
+  </body>
+</html>
