@@ -36,8 +36,11 @@ global.phone = require('home-engine-phone');
 global.phone_socket = null;
 global.tablet_socket = null;
 
+var port = process.env.OPENSHIFT_INTERNAL_PORT || 3000
+    , ip = process.env.OPENSHIFT_INTERNAL_IP || "192.168.1.177";
 
-server.listen(3000);
+
+server.listen(port, ip);
 io.sockets.on('connection', function (socket) {
 	socket.on('setPseudo', function (data) {
 		socket.set('pseudo', data);
