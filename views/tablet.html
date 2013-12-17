@@ -139,7 +139,7 @@
 			$(this).addClass('btn btn-default btn-lg');
 		});
 		
-		$('.room a').click(function(){
+		$('.room a').click(function(e){
 			id = $(this).closest('div').attr('id');
 			
 			if ( $(this).text() == 'Open' ){
@@ -153,6 +153,8 @@
 				data = {'info' : {'name': 'turnedOff', 'value': id }};
 				sentMessage( data );
 			}
+			e.preventDefault();
+			
 		});
 		
 		//Sounds
@@ -164,25 +166,37 @@
 		    path: "ion.sound/sounds/",                // set path to sounds
 			volume: 0.8
 		});
-		$('#bell').click(function(){
+		$('#bell').click(function(e){
+			data = {'info' : {'name': 'door', 'value': 'door' }};
+			sentMessage( data );
 			$.ionSound.play("dingdong");
+			e.preventDefault();
 		});
 		
 		
 		
 	});
 	function parseMessage(message){
+		if(typeof(message) != 'string'){
+			return;
+		}
+		
 		if(message.length == 0){
 			return;
 		}
-		console.log(message);
+//		console.log(message);
 		message = message.split(";");
 		console.log(message);
 		
 		if(message[0] == 'door'){
+				console.log('door openn');
 				$('#door').css('opacity', '1')
 				$.ionSound.play("door_open");
-				$('#door').css('opacity', '0.2')
+				abc = setInterval(function(){
+					$('#door').css('opacity', '0.2')
+					console.log('ohanes');
+					clearInterval(abc);
+				}, 1000);
 		}else{
 			item = $("#" + message[0].toLowerCase() + ' a');
 			if(message[1] == "TRUE"){

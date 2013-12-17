@@ -54,6 +54,11 @@
 			</div>
 			<br/>
 			
+			<div id="desklamp" class="make-switch switch-large lamp" data-animated="true" data-text-label="DeskLamp">
+			    <input type="checkbox">
+			</div>
+			<br/>
+			
 			
 	    </div>
 	  </div>
@@ -63,7 +68,8 @@
 	      <h3 class="panel-title">Security</h3>
 	    </div>
 	    <div class="panel-body">
-			<a class="btn btn-primary btn-lg alarm">Alarm</a><br/>
+			<a class="btn btn-danger btn-lg alarm">Alarm</a><br/>
+			<a class="btn btn-danger btn-lg" id='door'>Door</a><br/>
 			
 	    </div>
 	  </div>
@@ -90,6 +96,11 @@
 					data = {'command' : {'name': 'turnOn', 'value': $(this).attr('data-text-label')} };
 					sentMessage( data );					
 				}
+			 });
+			 
+			 $('#door').click(function(){
+				data = {'command' : {'name': 'open', 'value': 'door' }};
+				sentMessage( data );
 			 });
 			
 			
@@ -123,14 +134,20 @@
 			if(message.length == 0){
 				return;
 			}
-			console.log(message);
-			message = message.split(";");
-			console.log(message);
-			item = $("#" + message[0].toLowerCase() + ' a');
-			if(message[1] == "TRUE"){
-				$(item).text('Open').click();
-			}else{
-				$(item).text('Close').click();
+			if(typeof(message) == 'string'){
+				return;
+			}
+			//console.log(message);
+			//message = message.split(";");
+			vall = message.info.value.toLowerCase();
+			if(message.info.name == 'turnedOn'){
+				$('#' + vall).bootstrapSwitch('setState', true);
+			}
+			else if(message.info.name == 'turnedOff'){
+				$('#' + vall).bootstrapSwitch('setState', false);
+			}
+			else if(message.info.name == 'door'){
+				alert('doorbell is ringing');
 			}
 		}
 	</script>

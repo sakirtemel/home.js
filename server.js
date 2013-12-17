@@ -35,8 +35,11 @@ global.phone = require('home-engine-phone');
 
 global.phone_socket = null;
 global.tablet_socket = null;
+global.iosockets = io.sockets;
+global.arduinosocket = null;
 
-var port = process.env.OPENSHIFT_INTERNAL_PORT || 3050
+
+var port = process.env.OPENSHIFT_INTERNAL_PORT || 3000
     , ip = process.env.OPENSHIFT_INTERNAL_IP || "192.168.1.177";
     console.log('Listening on ' + port);
 
@@ -46,13 +49,13 @@ io.sockets.on('connection', function (socket) {
 	socket.on('setPseudo', function (data) {
 		socket.set('pseudo', data);
 		if ( data == 'tablet' ){
-			global.tablet_socket = socket;
+			tablet_socket = socket;
 			//id = Math.floor((Math.random()*100)+1);
 			id = 0;
 			socket.set('id', id);
 			console.log('id : ' + id);
 		}else{
-			global.phone_socket = socket;
+			phone_socket = io.socket;
 			socket.set('id', -1);
 		}
 	});
@@ -65,17 +68,30 @@ io.sockets.on('connection', function (socket) {
 		socket.get('id', function(error, id){
 			socket.get('pseudo', function (error, name) {
 				if ( name == 'phone' ){
-					tablet_socket = socket;
+			//		tablet_socket = socket;
 					phone.process(message);
 				}
 				else if ( name == 'tablet' ){
-					phone_socket = socket;
+			//		phone_socket = socket;
 					engine.virtual_home.getMessage(message);
 				}
 				console.log("user " + name + '-' + id + " send this : " + message);
 			});
 		})
 	});
+});
+/* arduino */
+var SerialPort = require("serialport").SerialPort
+var serialPort = new SerialPort("/dev/tty.usbmodem411", {
+  baudrate: 9600
+});
+arduinosocket = serialPort;
+
+serialPort.on("open", function () {
+  console.log('open');
+  serialPort.on('data', function(data) {
+    console.log('data received: ' + data);
+  });
 });
 
 
